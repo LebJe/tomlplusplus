@@ -4931,7 +4931,9 @@ TOML_NAMESPACE_START
 		TOML_CONST_INLINE_GETTER
 		value<int64_t>* as_integer() noexcept final
 		{
-			return as_value<int64_t>(this);
+			value<int64_t> * val = as_value<int64_t>(this);
+			val->flags(this->flags_);
+			return val;
 		}
 
 		TOML_CONST_INLINE_GETTER
