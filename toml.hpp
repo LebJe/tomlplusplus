@@ -4932,7 +4932,11 @@ TOML_NAMESPACE_START
 		value<int64_t>* as_integer() noexcept final
 		{
 			value<int64_t> * val = as_value<int64_t>(this);
-			val->flags(this->flags_);
+
+			if (val) {
+				val->flags(this->flags_);
+			};
+
 			return val;
 		}
 
