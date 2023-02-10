@@ -7,9 +7,6 @@
 
 #define INCLUDE_TOMLPLUSPLUS_H // old guard name used pre-v3
 
-//# Note: these would be included transitively as with any normal C++ project but
-//# they're listed explicitly here because this file is used as the source for generate_single_header.py.
-
 #include "impl/preprocessor.h"
 
 TOML_PUSH_WARNINGS;
@@ -24,12 +21,12 @@ TOML_DISABLE_SUGGEST_ATTR_WARNINGS;
 #pragma warning(disable : 4251) // dll exports for std lib types
 #endif
 #elif TOML_CLANG
-#pragma clang diagnostic ignored "-Wheader-hygiene"
+TOML_PRAGMA_CLANG(diagnostic ignored "-Wheader-hygiene")
 #if TOML_CLANG >= 12
-#pragma clang diagnostic ignored "-Wc++20-extensions"
+TOML_PRAGMA_CLANG(diagnostic ignored "-Wc++20-extensions")
 #endif
-#if (TOML_CLANG == 13) && !defined(__APPLE__)
-#pragma clang diagnostic ignored "-Wreserved-identifier"
+#if TOML_CLANG == 13
+TOML_PRAGMA_CLANG(diagnostic ignored "-Wreserved-identifier")
 #endif
 #endif
 
@@ -90,8 +87,8 @@ TOML_POP_WARNINGS;
 #undef TOML_ANON_NAMESPACE
 #undef TOML_ANON_NAMESPACE_END
 #undef TOML_ANON_NAMESPACE_START
-#undef TOML_ARCH_ARM
 #undef TOML_ARCH_AMD64
+#undef TOML_ARCH_ARM
 #undef TOML_ARCH_ARM32
 #undef TOML_ARCH_ARM64
 #undef TOML_ARCH_ITANIUM
@@ -102,6 +99,7 @@ TOML_POP_WARNINGS;
 #undef TOML_ASYMMETRICAL_EQUALITY_OPS
 #undef TOML_ATTR
 #undef TOML_CLANG
+#undef TOML_CLANG_VERSION
 #undef TOML_CLOSED_ENUM
 #undef TOML_CLOSED_FLAGS_ENUM
 #undef TOML_COMPILER_HAS_EXCEPTIONS
@@ -131,7 +129,13 @@ TOML_POP_WARNINGS;
 #undef TOML_FLAGS_ENUM
 #undef TOML_FLOAT_CHARCONV
 #undef TOML_FLOAT128
-#undef TOML_FLOAT16
+#undef TOML_FLOAT16_DIG
+#undef TOML_FLOAT16_LIMITS_SET
+#undef TOML_FLOAT16_MANT_DIG
+#undef TOML_FLOAT16_MAX_10_EXP
+#undef TOML_FLOAT16_MAX_EXP
+#undef TOML_FLOAT16_MIN_10_EXP
+#undef TOML_FLOAT16_MIN_EXP
 #undef TOML_GCC
 #undef TOML_HAS_ATTR
 #undef TOML_HAS_BUILTIN

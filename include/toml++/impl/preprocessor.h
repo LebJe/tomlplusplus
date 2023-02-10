@@ -34,8 +34,11 @@
 //# COMPILER / OS
 //#=====================================================================================================================
 
+#define TOML_MAKE_VERSION(major, minor, patch) (((major)*10000) + ((minor)*100) + ((patch)))
+
 #ifdef __clang__
-#define TOML_CLANG __clang_major__
+#define TOML_CLANG		   __clang_major__
+#define TOML_CLANG_VERSION TOML_MAKE_VERSION(__clang_major__, __clang_minor__, __clang_patchlevel__)
 #else
 #define TOML_CLANG 0
 #endif
@@ -74,6 +77,33 @@
 #define TOML_INTELLISENSE 1
 #else
 #define TOML_INTELLISENSE 0
+#endif
+
+// special handling for apple clang; see:
+// - https://github.com/marzer/tomlplusplus/issues/189
+// - https://en.wikipedia.org/wiki/Xcode
+// - https://stackoverflow.com/questions/19387043/how-can-i-reliably-detect-the-version-of-clang-at-preprocessing-time
+#if TOML_CLANG && defined(__apple_build_version__)
+#undef TOML_CLANG
+#if TOML_CLANG_VERSION >= TOML_MAKE_VERSION(14, 0, 0)
+#define TOML_CLANG 14
+#elif TOML_CLANG_VERSION >= TOML_MAKE_VERSION(13, 1, 6)
+#define TOML_CLANG 13
+#elif TOML_CLANG_VERSION >= TOML_MAKE_VERSION(13, 0, 0)
+#define TOML_CLANG 12
+#elif TOML_CLANG_VERSION >= TOML_MAKE_VERSION(12, 0, 5)
+#define TOML_CLANG 11
+#elif TOML_CLANG_VERSION >= TOML_MAKE_VERSION(12, 0, 0)
+#define TOML_CLANG 10
+#elif TOML_CLANG_VERSION >= TOML_MAKE_VERSION(11, 0, 3)
+#define TOML_CLANG 9
+#elif TOML_CLANG_VERSION >= TOML_MAKE_VERSION(11, 0, 0)
+#define TOML_CLANG 8
+#elif TOML_CLANG_VERSION >= TOML_MAKE_VERSION(10, 0, 1)
+#define TOML_CLANG 7
+#else
+#define TOML_CLANG 6 // not strictly correct but doesn't matter below this
+#endif
 #endif
 
 //#=====================================================================================================================
@@ -438,6 +468,7 @@
 
 #define TOML_PUSH_WARNINGS                                                                                             \
 	TOML_PRAGMA_CLANG(diagnostic push)                                                                                 \
+	TOML_PRAGMA_CLANG(diagnostic ignored "-Wunknown-warning-option")                                                   \
 	static_assert(true)
 
 #define TOML_DISABLE_SWITCH_WARNINGS                                                                                   \
@@ -484,7 +515,7 @@
 	__pragma(warning(push))                                                                                            \
 	static_assert(true)
 
-#if TOML_HAS_INCLUDE(<CodeAnalysis / Warnings.h>)
+#if TOML_HAS_INCLUDE(<CodeAnalysis/Warnings.h>)
 #pragma warning(push, 0)
 #include <CodeAnalysis/Warnings.h>
 #pragma warning(pop)
@@ -938,8 +969,6 @@
 /// \def TOML_SMALL_FLOAT_TYPE
 /// \brief If your codebase has an additional 'small' float type (e.g. half-precision), this tells toml++ about it.
 /// \detail Not defined by default.
-/// \remark	If you're building for a platform that has `_Float16` and/or `__fp16`, you don't
-/// 		need to use this configuration option to make toml++ aware of them. The library comes with that built-in.
 //# }}
 
 #ifndef TOML_UNDEF_MACROS
@@ -998,6 +1027,15 @@ TOML_ENABLE_WARNINGS;
 /// \detail Not defined by default.
 //# }}
 
+#ifndef TOML_ENABLE_FLOAT16
+#define TOML_ENABLE_FLOAT16 0
+#endif
+//# {{
+/// \def TOML_ENABLE_FLOAT16
+/// \brief Enable support for the built-in `_Float16` type.
+/// \detail Defaults to `0`.
+//# }}
+
 /// @}
 //#====================================================================================================================
 //# CHARCONV SUPPORT
@@ -1052,45 +1090,6 @@ TOML_ENABLE_WARNINGS;
 //# }}
 
 //#=====================================================================================================================
-//# FLOAT16
-//#=====================================================================================================================
-
-#if TOML_CLANG
-//# {{
-//	Excerpt from https://clang.llvm.org/docs/LanguageExtensions.html:
-//
-//	_Float16 is currently only supported on the following targets,
-//	with further targets pending ABI standardization:
-//
-//		32-bit ARM
-//		64-bit ARM (AArch64)
-//		AMDGPU
-//		SPIR
-//		X86 as long as SSE2 is available
-//
-//# }}
-#if (TOML_ARCH_ARM || TOML_ARCH_X86 || TOML_ARCH_AMD64) && defined(__FLT16_MANT_DIG__)
-#define TOML_FLOAT16 _Float16
-#endif
-#elif TOML_GCC
-//# {{
-//	Excerpt from https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html:
-//
-//	The _Float16 type is supported on AArch64 systems by default, on ARM systems when the IEEE format for
-//	16-bit floating-point types is selected with -mfp16-format=ieee and,
-//	for both C and C++, on x86 systems with SSE2 enabled.
-//
-//	*** except: the bit about x86 seems incorrect?? ***
-//# }}
-/*
-
- */
-#if (TOML_ARCH_ARM /*|| TOML_ARCH_X86 || TOML_ARCH_AMD64*/) && defined(__FLT16_MANT_DIG__)
-#define TOML_FLOAT16 _Float16
-#endif
-#endif
-
-//#=====================================================================================================================
 //# FLOAT128
 //#=====================================================================================================================
 
@@ -1116,9 +1115,6 @@ TOML_ENABLE_WARNINGS;
 #include "version.h"
 
 #define TOML_LIB_SINGLE_HEADER 0
-
-#define TOML_MAKE_VERSION(major, minor, patch)											\
-		((major) * 10000 + (minor) * 100 + (patch))
 
 #if TOML_ENABLE_UNRELEASED_FEATURES
 	#define TOML_LANG_EFFECTIVE_VERSION													\

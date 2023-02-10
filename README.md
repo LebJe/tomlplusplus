@@ -113,7 +113,7 @@ You'll find some more code examples in the `examples` directory, and plenty more
 
 ### Conan
 
-Add `tomlplusplus/3.2.0` to your conanfile.
+Add `tomlplusplus/3.3.0` to your conanfile.
 
 ### DDS
 
@@ -121,7 +121,7 @@ Add `tomlpp` to your `package.json5`, e.g.:
 
 ```plaintext
 depends: [
-    'tomlpp^3.2.0',
+    'tomlpp^3.3.0',
 ]
 ```
 
@@ -166,7 +166,7 @@ include(FetchContent)
 FetchContent_Declare(
     tomlplusplus
     GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
-    GIT_TAG        v3.2.0
+    GIT_TAG        v3.3.0
 )
 FetchContent_MakeAvailable(tomlplusplus)
 ```
@@ -209,6 +209,7 @@ won't need to mess with these at all, but if you do, set them before including t
 | `TOML_CALLCONV`                   |     define     | Calling convention to apply to exported free/static functions.                                           | undefined              |
 | `TOML_CONFIG_HEADER`              | string literal | Includes the given header file before the rest of the library.                                           | undefined              |
 | `TOML_ENABLE_FORMATTERS`          |     boolean    | Enables the formatters. Set to `0` if you don't need them to improve compile times and binary size.      | `1`                    |
+| `TOML_ENABLE_FLOAT16`             |     boolean    | Enables support for the built-in `_Float16` type.                                                        | per compiler settings  |
 | `TOML_ENABLE_PARSER`              |     boolean    | Enables the parser. Set to `0` if you don't need it to improve compile times and binary size.            | `1`                    |
 | `TOML_ENABLE_UNRELEASED_FEATURES` |     boolean    | Enables support for [unreleased TOML language features].                                                 | `0`                    |
 | `TOML_ENABLE_WINDOWS_COMPAT`      |     boolean    | Enables support for transparent conversion between wide and narrow strings.                              | `1` on Windows         |

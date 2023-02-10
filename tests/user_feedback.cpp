@@ -375,4 +375,22 @@ b = []
 			b = [c"]
 		)"sv);
 	}
+
+	SECTION("tomlplusplus/issues/179") // https://github.com/marzer/tomlplusplus/issues/179
+	{
+		parse_expected_value(FILE_LINE_ARGS, "0.848213"sv, 0.848213);
+		parse_expected_value(FILE_LINE_ARGS, "6.9342"sv, 6.9342);
+		parse_expected_value(FILE_LINE_ARGS, "-995.9214"sv, -995.9214);
+	}
+
+	SECTION("tomlplusplus/issues/187") // https://github.com/marzer/tomlplusplus/issues/187
+	{
+		parsing_should_succeed(FILE_LINE_ARGS, R"(
+			[[a.b]]
+			x = 1
+
+			[a]
+			y = 2
+		)"sv);
+	}
 }
